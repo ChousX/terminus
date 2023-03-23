@@ -1,5 +1,6 @@
 pub mod debug;
 mod event;
+
 mod input;
 mod startup;
 
@@ -14,7 +15,7 @@ impl Plugin for CameraPlugin {
             .init_resource::<input::MouseSensitivity>()
             .init_resource::<input::MouseZoomSensitivity>()
             .add_startup_system(startup::new_camera)
-            .add_startup_system(startup::test_seen_2d)
+            //.add_startup_system(startup::test_seen_2d)
             .add_system(input::keybored)
             .add_system(input::mouse_move)
             .add_system(input::mouse_zoom)
