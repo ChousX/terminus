@@ -4,6 +4,7 @@ pub struct SelectorPlugin;
 impl Plugin for SelectorPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Selector>().init_resource::<Selected>();
+        info!("PluginLoaded");
     }
 }
 

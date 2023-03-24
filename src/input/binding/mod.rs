@@ -1,7 +1,7 @@
-mod keyboard;
-mod mouse_keyboard;
+pub mod keyboard;
+pub mod mouse_keyboard;
 
-use crate::{camera::CameraMoveEvent, prelude::*};
+use crate::{prelude::*, CameraMoveEvent};
 
 #[derive(Debug)]
 pub enum Key {
@@ -9,25 +9,43 @@ pub enum Key {
     Board(KeyCode),
 }
 
-pub type Mask = [bool; 4];
+pub type Mask = [bool; 3];
 
 #[derive(Debug)]
 pub struct Binding {
     keys: Vec<Key>,
-    mask: Mask,
+    mask: Option<Mask>,
 }
 
-pub type ModKeys = [Key; 4];
+pub type ModKeys = [Vec<Key>; 3];
 
-impl Binding {
+#[derive(Resource)]
+pub struct ModBindings(pub ModKeys);
+impl Default for ModBindings {
+    fn default() -> Self {
+        use KeyCode::*;
+        Self([
+            vec![Key::Board(LShift)],
+            vec![Key::Board(LControl)],
+            vec![Key::Board(LAlt)],
+        ])
+    }
+}
+
+impl ModBindings {
     pub fn check(
         &self,
         keys: &Input<KeyCode>,
         mouse: &Input<MouseButton>,
-        modkeys: &ModKeys,
+        binding: &Binding,
     ) -> bool {
-        let mod_mask = get_mod_mask(keys, mouse, modkeys);
-        check_mask(self.mask, mod_mask) && check_keys(&self.keys, keys, mouse)
+        if let Some(mask) = binding.mask {
+            let modmask = get_mod_mask(keys, mouse, &self.0);
+            if !check_mask(&modmask, &mask) {
+                return false;
+            }
+        }
+        check_keys(&binding.keys, keys, mouse)
     }
 }
 
@@ -49,7 +67,7 @@ fn check_keys(bindings: &[Key], keys: &Input<KeyCode>, mouse: &Input<MouseButton
     false
 }
 
-fn check_mask(one: Mask, two: Mask) -> bool {
+fn check_mask(one: &Mask, two: &Mask) -> bool {
     for i in 0..(one.len()) {
         if one[i] != two[i] {
             return false;
@@ -59,24 +77,9 @@ fn check_mask(one: Mask, two: Mask) -> bool {
 }
 
 fn get_mod_mask(keys: &Input<KeyCode>, mouse: &Input<MouseButton>, mod_keys: &ModKeys) -> Mask {
-    let mut out = [false, false, false, false];
+    let mut out = [false; 3];
     for (i, key) in mod_keys.iter().enumerate() {
-        if match *key {
-            Key::Board(key) => keys.pressed(key),
-            Key::Mouse(key) => mouse.pressed(key),
-        } {
-            out[i] = true;
-        }
+        out[i] = check_keys(key, keys, mouse);
     }
     out
-}
-
-pub trait Bindable {
-    fn move_camera(
-        &self,
-        keys: &Input<KeyCode>,
-        mouse: &Input<MouseButton>,
-    ) -> Option<CameraMoveEvent>;
-    fn start_selection(&self, keys: &Input<KeyCode>, mouse: &Input<MouseButton>) -> bool;
-    fn end_selection(&self, keys: &Input<KeyCode>, mouse: &Input<MouseButton>) -> bool;
 }
