@@ -1,7 +1,7 @@
 pub mod keyboard;
 pub mod mouse_keyboard;
 
-use crate::{prelude::*, CameraMoveEvent};
+use crate::prelude::*;
 
 #[derive(Debug)]
 pub enum Key {
@@ -13,8 +13,8 @@ pub type Mask = [bool; 3];
 
 #[derive(Debug)]
 pub struct Binding {
-    keys: Vec<Key>,
-    mask: Option<Mask>,
+    pub keys: Vec<Key>,
+    pub mask: Option<Mask>,
 }
 
 pub type ModKeys = [Vec<Key>; 3];
@@ -25,9 +25,9 @@ impl Default for ModBindings {
     fn default() -> Self {
         use KeyCode::*;
         Self([
-            vec![Key::Board(LShift)],
-            vec![Key::Board(LControl)],
-            vec![Key::Board(LAlt)],
+            vec![Key::Board(LShift), Key::Board(RShift)],
+            vec![Key::Board(LControl), Key::Board(RControl)],
+            vec![Key::Board(LAlt), Key::Board(RAlt)],
         ])
     }
 }

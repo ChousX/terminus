@@ -1,5 +1,6 @@
 mod camera;
 mod input;
+mod mob;
 mod prelude;
 mod selection;
 
