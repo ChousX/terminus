@@ -95,10 +95,23 @@ pub fn should_switch_input(
     mouse: Res<bevy::prelude::Input<MouseButton>>,
     modkes: Res<binding::ModBindings>,
     bindings: Res<GeneralInputBindings>,
+    mut lock: Local<bool>,
 ) -> bool {
-    modkes.check(&keys, &mouse, &bindings.switch_input)
+    if modkes.check(&keys, &mouse, &bindings.switch_input) {
+        if *lock == false {
+            *lock = true;
+            true
+        } else {
+            false
+        }
+    } else {
+        *lock = false;
+        false
+    }
 }
 
 pub fn switch_input(mut input: ResMut<Input>) {
+    let temp = input.clone();
     input.switch();
+    info!("|{:?}|->|{:?}", temp, *input);
 }

@@ -7,7 +7,7 @@ impl Plugin for CameraPlugin {
         app.add_event::<CameraMoveEvent>()
             .init_resource::<CameraMoveSettings>()
             .add_startup_system(spawn_camera)
-            .add_startup_system(test_icon)
+            //            .add_startup_system(test_icon)
             .add_system(camera_zoom)
             .add_system(
                 CameraMoveEvent::handle
@@ -53,7 +53,7 @@ impl CameraMoveEvent {
 
 #[derive(Resource)]
 pub struct CameraMoveSettings {
-    speed: f32,
+    pub speed: f32,
 }
 
 impl Default for CameraMoveSettings {
@@ -74,9 +74,8 @@ pub fn test_icon(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 pub fn camera_zoom(
-    mut camera: Query<&mut OrthographicProjection, With<Camera2d>>,
+    mut camera: Query<&mut OrthographicProjection>,
     mut scroll_evr: EventReader<bevy::input::mouse::MouseWheel>,
-    mut time: Res<Time>,
 ) {
     let mut projection = camera.single_mut();
     // example: zoom in
@@ -84,9 +83,9 @@ pub fn camera_zoom(
     for scroll in scroll_evr.iter() {
         total += scroll.y;
     }
-    projection.scale += total * time.delta_seconds();
+    projection.scale += total; //* time.delta_seconds();
 
-    const MIN: f32 = 0.5;
+    const MIN: f32 = 1.0;
     const MAX: f32 = 10.0;
     projection.scale = projection.scale.clamp(MIN, MAX);
 }

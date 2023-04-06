@@ -1,31 +1,99 @@
-mod actions; // (3) ware things are actuly done
-mod context; // (1)The information that has been collected
-mod desires; // (2)A list generated from the the context. Each entry is ranked by want, what ever is ranked heighest is preformed
+mod chunk;
+pub mod cognition;
+mod digestion;
+mod health;
 mod movement;
-mod perception; // (0)How the mob gets information
+mod stamina;
 
-use crate::prelude::*;
+use crate::{prelude::*, selection::Selectable};
 
-use self::{context::Context, movement::MobMoveEvent, perception::PerceptSet};
+use bevy_prototype_lyon::prelude::{shapes, Fill, GeometryBuilder, ShapeBundle, Stroke};
+use cognition::CognitionPlugin;
+
+use self::{
+    chunk::MobChunks,
+    cognition::PerceptionBundle,
+    digestion::{digestion, Stomach},
+    stamina::Stamina,
+};
 
 pub struct MobPlugin;
 impl Plugin for MobPlugin {
     fn build(&self, app: &mut App) {
-        // all
-        app.add_event::<perception::PerceptionEvent>()
-            .add_event::<MobMoveEvent>();
-        // Percept's
-        app.add_systems(
-            (perception::sent, perception::sight, perception::sound).in_set(PerceptSet),
-        );
-        // Context
-        app.add_system(context::build_context.after(PerceptSet));
-        //Desires
-        app.add_system(desires::inclination.after(context::build_context));
-        //Actions
-        app.add_system(MobMoveEvent::handle);
+        app.init_resource::<MobChunks>()
+            .add_system(MobChunks::update)
+            .add_event::<movement::MobMoveEvent>()
+            .add_system(movement::MobMoveEvent::handle)
+            .add_system(movement::test.before(movement::MobMoveEvent::handle))
+            .add_startup_system(debug::test_mob_2d)
+            .add_system(digestion)
+            .add_system(debug::mod_dir_line)
+            .add_plugin(CognitionPlugin);
     }
 }
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Mob;
+
+#[derive(Bundle, Default)]
+pub struct MobBundle {
+    pub mob: Mob,
+    pub selectable: Selectable,
+    pub shape: ShapeBundle,
+    pub stamina: Stamina,
+    pub stomach: Stomach,
+    #[bundle]
+    pub perseption: PerceptionBundle,
+}
+
+impl MobBundle {
+    pub fn new(pos: Vec2) -> Self {
+        let shape = shapes::RegularPolygon {
+            sides: 3,
+            feature: shapes::RegularPolygonFeature::Radius(10.0),
+            ..shapes::RegularPolygon::default()
+        };
+        let transform = Transform::from_translation(pos.extend(0.0));
+        Self {
+            shape: ShapeBundle {
+                path: GeometryBuilder::build_as(&shape),
+                transform,
+                ..default()
+            },
+            ..default()
+        }
+    }
+}
+
+mod debug {
+    use super::*;
+    use bevy::prelude::*;
+    use bevy_prototype_debug_lines::DebugLines;
+
+    pub fn mod_dir_line(
+        transforms: Query<(&Transform, &Mob), With<Mob>>,
+        mut lines: ResMut<DebugLines>,
+    ) {
+        for (transform, mob) in transforms.iter() {
+            let start = transform.translation;
+            let forward_normal = (transform.rotation * Vec3::Y).truncate();
+            let end = (Vec2::splat(10.0 + 5.) * forward_normal).extend(0.0) + start;
+            lines.line(start, end, 0.0)
+        }
+    }
+
+    pub fn test_mob_2d(mut commands: Commands) {
+        for x in 0..1 {
+            for y in 0..1 {
+                commands.spawn((
+                    MobBundle::new(Vec2::new(
+                        x as f32 * 10.0 * 2. + 1.0,
+                        y as f32 * 10.0 * 2. + 1.0,
+                    )),
+                    Fill::color(Color::CYAN),
+                    Stroke::new(Color::BLACK, 0.2),
+                ));
+            }
+        }
+    }
+}

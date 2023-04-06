@@ -1,5 +1,5 @@
 pub mod movement;
-use bevy_inspector_egui::egui::epaint::text::cursor;
+
 use bevy_prototype_debug_lines::DebugLines;
 
 use crate::{prelude::*, selection::movement::SelectorMovementEvent};
@@ -43,16 +43,14 @@ impl FromWorld for Selector {
         let assets = world
             .get_resource::<AssetServer>()
             .expect("AssetServer Not Running");
-        let cursor = {
-            world
-                .spawn(SpriteBundle {
-                    texture: assets.load(r"test.png"),
-                    transform: Transform::from_translation(position.extend(0.0)),
-                    ..default()
-                })
-                .insert(Cursor)
-                .id()
-        };
+        let cursor = world
+            .spawn(SpriteBundle {
+                texture: assets.load(r"test.png"),
+                transform: Transform::from_translation(position.extend(0.0)),
+                ..default()
+            })
+            .insert(Cursor)
+            .id();
         Self {
             position,
             marker: None,
@@ -89,7 +87,7 @@ impl Selector {
 #[derive(Resource, Default)]
 pub struct Selected(Vec<Entity>);
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Selectable;
 
 pub fn start_selection(mut selector: ResMut<Selector>) {
@@ -105,7 +103,7 @@ pub fn stop_selection(
 ) {
     let mut selection = Vec::new();
     if let Some((bottem_left, top_right)) = selector.get_space() {
-        info!("{:?}|{:?}", bottem_left, top_right);
+        //info!("{:?}|{:?}", bottem_left, top_right);
         for (transform, e) in query.iter() {
             let position = transform.translation.truncate();
             if in_space(bottem_left, top_right, position) {
@@ -114,6 +112,7 @@ pub fn stop_selection(
         }
         selector.marker = None;
     }
+    info!("{:?}", &selection);
     selected.0 = selection;
 }
 
@@ -124,24 +123,28 @@ fn in_space(s: Vec2, b: Vec2, subject: Vec2) -> bool {
 
 pub fn dysplay_selection(selector: Res<Selector>, mut lines: ResMut<DebugLines>) {
     if let Some((one, two)) = selector.get_space() {
-        lines.line(one.extend(0.0), two.extend(0.0), 0.0);
+        let three = Vec2::new(one.x, two.y);
+        let four = Vec2::new(two.x, one.y);
+        lines.line(one.extend(0.0), three.extend(0.0), 0.0);
+        lines.line(one.extend(0.0), four.extend(0.0), 0.0);
+        lines.line(two.extend(0.0), three.extend(0.0), 0.0);
+        lines.line(two.extend(0.0), four.extend(0.0), 0.0);
     }
 }
 
-pub fn selector_mouce_syncer(
+fn selector_mouce_syncer(
+    camera_q: Query<(&Camera, &GlobalTransform)>,
     mut out: EventWriter<SelectorMovementEvent>,
-    query: Query<&Transform, With<Camera>>,
     window: Query<&Window>,
 ) {
+    let (camera, camera_transform) = camera_q.single();
     let window = window.single();
-    if let Some(cursor) = window.cursor_position() {
-        let camera_pos = query
-            .get_single()
-            .expect("There is more then one camera, Ahhhh")
-            .translation
-            .truncate();
-        let spot = cursor - (Vec2::new(window.width(), window.height()) * 0.5) + camera_pos;
-        out.send(SelectorMovementEvent::MoveTo(spot))
+    if let Some(world_position) = window
+        .cursor_position()
+        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+        .map(|ray| ray.origin.truncate())
+    {
+        out.send(SelectorMovementEvent::MoveTo(world_position))
     }
 }
 
