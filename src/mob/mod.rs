@@ -3,6 +3,7 @@ pub mod cognition;
 mod digestion;
 mod health;
 mod movement;
+mod pathing;
 mod stamina;
 
 use crate::{prelude::*, selection::Selectable};
@@ -17,6 +18,9 @@ use self::{
     stamina::Stamina,
 };
 
+pub use movement::MobMoveEvent;
+pub use pathing::{add_pos_to_selected_mobs, new_path_for_selected_mobs};
+
 pub struct MobPlugin;
 impl Plugin for MobPlugin {
     fn build(&self, app: &mut App) {
@@ -24,8 +28,10 @@ impl Plugin for MobPlugin {
             .add_system(MobChunks::update)
             .add_event::<movement::MobMoveEvent>()
             .add_system(movement::MobMoveEvent::handle)
-            .add_system(movement::test.before(movement::MobMoveEvent::handle))
+            .add_system(pathing::path_consumer.before(MobMoveEvent::handle))
+            //.add_system(movement::test.before(movement::MobMoveEvent::handle))
             .add_startup_system(debug::test_mob_2d)
+            .add_system(chunk::debug::dysplay_boxes.after(MobChunks::update))
             .add_system(digestion)
             .add_system(debug::mod_dir_line)
             .add_plugin(CognitionPlugin);
@@ -83,8 +89,8 @@ mod debug {
     }
 
     pub fn test_mob_2d(mut commands: Commands) {
-        for x in 0..1 {
-            for y in 0..1 {
+        for x in 0..10 {
+            for y in 0..10 {
                 commands.spawn((
                     MobBundle::new(Vec2::new(
                         x as f32 * 10.0 * 2. + 1.0,

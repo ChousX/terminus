@@ -12,6 +12,9 @@ pub struct MouseKeyboardBindings {
 
     mouse_move: Binding,
     start_selection: Binding,
+
+    new_path: Binding,
+    append_path: Binding,
 }
 
 impl Default for MouseKeyboardBindings {
@@ -41,6 +44,14 @@ impl Default for MouseKeyboardBindings {
             start_selection: Binding {
                 keys: vec![Key::Mouse(MouseButton::Left)],
                 mask: None,
+            },
+            new_path: Binding {
+                keys: vec![Key::Mouse(MouseButton::Right), Key::Board(M)],
+                mask: None,
+            },
+            append_path: Binding {
+                keys: vec![Key::Mouse(MouseButton::Right), Key::Board(M)],
+                mask: Some([true, false, false]),
             },
         }
     }
@@ -101,4 +112,22 @@ pub fn selector_end(
     bindings: Res<MouseKeyboardBindings>,
 ) -> bool {
     selector.marker.is_some() && !modkeys.check(&keys, &mouse, &bindings.start_selection)
+}
+
+pub fn new_path(
+    keys: Res<Input<KeyCode>>,
+    mouse: Res<Input<MouseButton>>,
+    modkeys: Res<ModBindings>,
+    bindings: Res<MouseKeyboardBindings>,
+) -> bool {
+    modkeys.check(&keys, &mouse, &bindings.new_path)
+}
+
+pub fn append_path(
+    keys: Res<Input<KeyCode>>,
+    mouse: Res<Input<MouseButton>>,
+    modkeys: Res<ModBindings>,
+    bindings: Res<MouseKeyboardBindings>,
+) -> bool {
+    modkeys.check(&keys, &mouse, &bindings.append_path)
 }

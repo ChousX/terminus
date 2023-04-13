@@ -1,4 +1,5 @@
 pub mod binding;
+use crate::mob::{add_pos_to_selected_mobs, new_path_for_selected_mobs};
 use crate::prelude::*;
 use crate::selection::{movement::SelectorMovementEvent, start_selection, stop_selection};
 
@@ -31,6 +32,8 @@ impl Plugin for InputPlugin {
                     binding::mouse_keyboard::camera_move_mouce,
                     start_selection.run_if(binding::mouse_keyboard::selector_start),
                     stop_selection.run_if(binding::mouse_keyboard::selector_end),
+                    add_pos_to_selected_mobs.run_if(binding::mouse_keyboard::append_path),
+                    new_path_for_selected_mobs.run_if(binding::mouse_keyboard::new_path),
                 )
                     .distributive_run_if(is_mouce_and_keyboard),
             );
@@ -95,23 +98,10 @@ pub fn should_switch_input(
     mouse: Res<bevy::prelude::Input<MouseButton>>,
     modkes: Res<binding::ModBindings>,
     bindings: Res<GeneralInputBindings>,
-    mut lock: Local<bool>,
 ) -> bool {
-    if modkes.check(&keys, &mouse, &bindings.switch_input) {
-        if *lock == false {
-            *lock = true;
-            true
-        } else {
-            false
-        }
-    } else {
-        *lock = false;
-        false
-    }
+    modkes.check(&keys, &mouse, &bindings.switch_input)
 }
 
 pub fn switch_input(mut input: ResMut<Input>) {
-    let temp = input.clone();
     input.switch();
-    info!("|{:?}|->|{:?}", temp, *input);
 }

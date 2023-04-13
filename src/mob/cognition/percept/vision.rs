@@ -9,11 +9,12 @@ pub struct Vision {
     range: f32,
     angle: f32,
 }
+
 impl Default for Vision {
     fn default() -> Self {
         Self {
-            range: 100.0,
-            angle: 90.0,
+            range: 150.0,
+            angle: 40.0,
         }
     }
 }
@@ -40,7 +41,6 @@ pub fn sight(
             let mut x_max = triangle[2].x;
             let mut y_min = triangle[2].y;
             let mut y_max = triangle[2].y;
-
             for i in 0..2 {
                 let subjet = &triangle[i];
                 if subjet.x < x_min {
@@ -48,24 +48,13 @@ pub fn sight(
                 } else if subjet.x > x_max {
                     x_max = subjet.x
                 }
-
                 if subjet.y < y_min {
                     y_min = subjet.y
                 } else if subjet.y > y_max {
                     y_max = subjet.y
                 }
             }
-
             let out = (Vec2::new(x_min, y_min), Vec2::new(x_max, y_max));
-            if false {
-                let p2 = Vec3::new(out.0.x, out.1.y, 0.0);
-                let p3 = Vec3::new(out.1.x, out.0.y, 0.0);
-                let out = (out.0.extend(0.0), out.1.extend(0.0));
-                lines.line(out.0, p2, 0.0);
-                lines.line(p2, out.1, 0.0);
-                lines.line(out.1, p3, 0.0);
-                lines.line(p3, out.0, 0.0);
-            }
             out
         };
         let local_entities = chunk.get_in_range(chunk_range.0, chunk_range.1).into_iter();
@@ -84,10 +73,10 @@ pub fn sight(
 
 fn build_triangle(transform: &Transform, range: f32, angle: f32) -> [Vec2; 3] {
     let rotation = transform.rotation;
-    let position = Vec2::new(transform.translation.x, transform.translation.y);
-    let vertex1 = position + (rotation * Vec3::new(range, 0.0, 0.0)).truncate();
-    let vertex2 = position + (rotation * Vec3::new(range, angle, 0.0)).truncate();
-    let vertex3 = position + (rotation * Vec3::new(range, -angle, 0.0)).truncate();
+    let position = transform.translation.truncate();
+    let vertex1 = position + (rotation * Vec3::new(0.0, 0.0, 0.0)).truncate();
+    let vertex2 = position + (rotation * Vec3::new(angle, range, 0.0)).truncate();
+    let vertex3 = position + (rotation * Vec3::new(-angle, range, 0.0)).truncate();
     [vertex1, vertex2, vertex3]
 }
 

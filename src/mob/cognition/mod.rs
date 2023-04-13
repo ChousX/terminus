@@ -11,9 +11,20 @@ use super::movement::MobMoveEvent;
 pub struct CognitionPlugin;
 impl Plugin for CognitionPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<PerceptionEvent>().add_system(sight);
+        app.add_event::<PerceptionEvent>()
+            .add_systems(
+                (
+                    sight,
+                    smell_ammet,
+                    smell_combiner.after(smell_ammet),
+                    sent.after(smell_combiner),
+                )
+                    .in_set(PerceptSet),
+            )
+            .add_system(PerceptionEvent::handle.after(PerceptSet));
     }
 }
+
 impl CognitionPlugin {
     fn _build(&self, app: &mut App) {
         // all

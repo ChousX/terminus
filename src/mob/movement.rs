@@ -103,6 +103,7 @@ pub fn test(
 ) {
     //
     for mob in query.iter() {
-        movement.send(MobMoveEvent::MoveAway(selector.position, mob))
+        movement.send(MobMoveEvent::MoveTowards(selector.position, mob));
+        movement.send(MobMoveEvent::FaceTowards(selector.position, mob));
     }
 }

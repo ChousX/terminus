@@ -84,3 +84,23 @@ impl Default for MobChunks {
 
 #[derive(Deref, DerefMut, Debug, Default)]
 pub struct Chunk(pub HashSet<Entity>);
+
+pub mod debug {
+    use super::*;
+    use bevy::prelude::*;
+    use bevy_prototype_debug_lines::DebugLines;
+
+    pub fn dysplay_boxes(mut lines: ResMut<DebugLines>, chunks: Res<MobChunks>) {
+        let chunk = chunks.chunks.keys();
+        for chunk in chunk {
+            let p1 = (Vec2::new(chunk.x as f32, chunk.y as f32) * chunks.chunk_size).extend(0.0);
+            let p3 = p1 + chunks.chunk_size.extend(0.0);
+            let p2 = Vec3::new(p3.x, p1.y, 0.0);
+            let p4 = Vec3::new(p1.x, p3.y, 0.0);
+            lines.line(p1, p2, 0.0);
+            lines.line(p2, p3, 0.0);
+            lines.line(p3, p4, 0.0);
+            lines.line(p4, p1, 0.0);
+        }
+    }
+}

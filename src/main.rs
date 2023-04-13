@@ -17,7 +17,7 @@ fn main() {
         .add_plugin(DebugLinesPlugin::default())
         .add_plugin(camera::CameraPlugin)
         .add_plugin(input::InputPlugin)
-        .add_plugin(mob::MobPlugin)
         .add_plugin(selection::SelectorPlugin)
+        .add_plugin(mob::MobPlugin)
         .run();
 }

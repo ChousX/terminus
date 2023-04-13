@@ -1,5 +1,7 @@
 pub mod movement;
 
+//BUG moveing with the keyboard throughs off the selector
+// the real problem mostlikly lise in the input section
 use bevy_prototype_debug_lines::DebugLines;
 
 use crate::{prelude::*, selection::movement::SelectorMovementEvent};
@@ -84,7 +86,7 @@ impl Selector {
     }
 }
 
-#[derive(Resource, Default)]
+#[derive(Resource, Default, Deref)]
 pub struct Selected(Vec<Entity>);
 
 #[derive(Component, Default)]
