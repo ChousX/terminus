@@ -6,7 +6,6 @@ use crate::selection::Selector;
 pub enum MobMoveEvent {
     MoveTowards(Vec2, Entity),
     FaceTowards(Vec2, Entity),
-    TurnThenMove(Vec2, Entity),
 }
 
 impl MobMoveEvent {
@@ -20,21 +19,16 @@ impl MobMoveEvent {
             match *event {
                 MoveTowards(target, entity) => {
                     if let Ok((mut transform, move_data)) = query.get_mut(entity) {
-                        move_data.move_to(target, &mut transform, time.delta_seconds());
-                    }
-                }
-                FaceTowards(target, entity) => {
-                    if let Ok((mut transform, move_data)) = query.get_mut(entity) {
-                        move_data.turn(target, &mut transform, time.delta_seconds());
-                    }
-                }
-                TurnThenMove(target, entity) => {
-                    if let Ok((mut transform, move_data)) = query.get_mut(entity) {
                         move_data.turn(target, &mut transform, time.delta_seconds());
                         let in_vistion_angle = true;
                         if in_vistion_angle {
                             move_data.move_to(target, &mut transform, time.delta_seconds());
                         }
+                    }
+                }
+                FaceTowards(target, entity) => {
+                    if let Ok((mut transform, move_data)) = query.get_mut(entity) {
+                        move_data.turn(target, &mut transform, time.delta_seconds());
                     }
                 }
             }
