@@ -15,6 +15,7 @@ use self::{
     chunk::MobChunks,
     cognition::PerceptionBundle,
     digestion::{digestion, Stomach},
+    movement::MobMoveData,
     stamina::Stamina,
 };
 
@@ -50,6 +51,7 @@ pub struct MobBundle {
     pub stomach: Stomach,
     #[bundle]
     pub perseption: PerceptionBundle,
+    pub mob_move_data: MobMoveData,
 }
 
 impl MobBundle {

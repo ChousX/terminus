@@ -46,12 +46,12 @@ impl Default for MouseKeyboardBindings {
                 mask: None,
             },
             new_path: Binding {
-                keys: vec![Key::Mouse(MouseButton::Right), Key::Board(M)],
+                keys: vec![Key::Mouse(MouseButton::Right), Key::Board(P)],
                 mask: None,
             },
             append_path: Binding {
                 keys: vec![Key::Mouse(MouseButton::Right), Key::Board(M)],
-                mask: Some([true, false, false]),
+                mask: None,
             },
         }
     }

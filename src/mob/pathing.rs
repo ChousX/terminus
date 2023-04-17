@@ -43,7 +43,9 @@ pub fn path_consumer(
         if let Some(front) = path.0.front() {
             let current = transform.translation.truncate();
             let delta = (current - *front).abs();
-            if delta.x <= f32::EPSILON && delta.y <= f32::EPSILON {
+            const C: f32 = 5.0;
+            if delta.x <= C && delta.y <= C {
+                info!("pop");
                 path.pop();
             } else {
                 mover.send(MobMoveEvent::MoveTowards(*front, e))

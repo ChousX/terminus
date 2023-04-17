@@ -1,33 +1,34 @@
-use super::cognition::SoundEvent;
+use super::cognition::Vision;
 use super::Mob;
 use crate::prelude::*;
 use crate::selection::Selector;
 
 pub enum MobMoveEvent {
     MoveTowards(Vec2, Entity),
-    FaceTowards(Vec2, Entity),
+    _FaceTowards(Vec2, Entity),
 }
 
 impl MobMoveEvent {
     pub fn handle(
         mut events: EventReader<MobMoveEvent>,
-        mut query: Query<(&mut Transform, &MobMoveData)>,
+        mut query: Query<(&mut Transform, &MobMoveData, &Vision)>,
         time: Res<Time>,
     ) {
         for event in events.iter() {
             use MobMoveEvent::*;
             match *event {
                 MoveTowards(target, entity) => {
-                    if let Ok((mut transform, move_data)) = query.get_mut(entity) {
+                    if let Ok((mut transform, move_data, vision)) = query.get_mut(entity) {
                         move_data.turn(target, &mut transform, time.delta_seconds());
+                        //TODO:
                         let in_vistion_angle = true;
                         if in_vistion_angle {
                             move_data.move_to(target, &mut transform, time.delta_seconds());
                         }
                     }
                 }
-                FaceTowards(target, entity) => {
-                    if let Ok((mut transform, move_data)) = query.get_mut(entity) {
+                _FaceTowards(target, entity) => {
+                    if let Ok((mut transform, move_data, _)) = query.get_mut(entity) {
                         move_data.turn(target, &mut transform, time.delta_seconds());
                     }
                 }
@@ -40,6 +41,15 @@ impl MobMoveEvent {
 pub struct MobMoveData {
     move_speed: f32,
     rotation_speed: f32,
+}
+
+impl Default for MobMoveData {
+    fn default() -> Self {
+        Self {
+            move_speed: 5.0,
+            rotation_speed: 3.0,
+        }
+    }
 }
 
 impl MobMoveData {
@@ -72,6 +82,7 @@ impl MobMoveData {
         transform.translation += direction_normalized.extend(0.0) * self.move_speed * time_delta;
         //
     }
+
     pub fn _move_away(&self, target: Vec2, transform: &mut Mut<Transform>, time_delta: f32) {
         // Calculate the direction vector from the
         let direction = transform.translation.truncate() - target;
@@ -110,6 +121,5 @@ pub fn test(
     //
     for mob in query.iter() {
         movement.send(MobMoveEvent::MoveTowards(selector.position, mob));
-        movement.send(MobMoveEvent::FaceTowards(selector.position, mob));
     }
 }
