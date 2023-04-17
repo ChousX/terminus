@@ -2,6 +2,7 @@ use crate::prelude::*;
 
 use super::stamina::Stamina;
 
+#[derive(Component)]
 pub enum Food {
     Plant(f32),
     Animal(f32),
@@ -15,6 +16,10 @@ impl Food {
             Food::Plant(ammount) => ammount,
         }
     }
+}
+
+pub struct FoodBundle {
+    food: Food,
 }
 
 pub trait Edible {

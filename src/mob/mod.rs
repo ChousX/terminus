@@ -1,5 +1,5 @@
 pub mod cognition;
-mod digestion;
+pub mod digestion;
 mod health;
 mod movement;
 mod pathing;
