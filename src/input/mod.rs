@@ -5,6 +5,9 @@ use crate::selection::{movement::SelectorMovementEvent, start_selection, stop_se
 
 use self::binding::{Binding, ModBindings};
 
+//TODO: This hole thing needs a touch up 
+// mybe try the monolithic aproch
+
 pub struct InputPlugin;
 impl Plugin for InputPlugin {
     fn build(&self, app: &mut App) {
