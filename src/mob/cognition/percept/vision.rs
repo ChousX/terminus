@@ -1,6 +1,6 @@
 use bevy_prototype_debug_lines::DebugLines;
 
-use crate::{mob::chunk::MobChunks, prelude::*};
+use crate::{mob::MobChunks, prelude::*};
 
 use super::PerceptionEvent;
 

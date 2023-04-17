@@ -5,7 +5,7 @@ use bevy::utils::{HashMap, HashSet};
 use crate::prelude::*;
 
 #[derive(Resource)]
-pub struct ChunkManager<T> {
+pub struct ChunkManager<T: Chunkable> {
     chunks: HashMap<IVec2, HashSet<Entity>>,
     chunk_size: Vec2,
     phantom: std::marker::PhantomData<T>,

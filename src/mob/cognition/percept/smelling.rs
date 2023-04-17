@@ -1,4 +1,4 @@
-use crate::{mob::chunk::MobChunks, prelude::*};
+use crate::{mob::MobChunks, prelude::*};
 
 use super::PerceptionEvent;
 

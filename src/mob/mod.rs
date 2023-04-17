@@ -1,4 +1,3 @@
-mod chunk;
 pub mod cognition;
 mod digestion;
 mod health;
@@ -12,7 +11,6 @@ use bevy_prototype_lyon::prelude::{shapes, Fill, GeometryBuilder, ShapeBundle, S
 use cognition::CognitionPlugin;
 
 use self::{
-    chunk::MobChunks,
     cognition::PerceptionBundle,
     digestion::{digestion, Stomach},
     movement::MobMoveData,
@@ -21,6 +19,8 @@ use self::{
 
 pub use movement::MobMoveEvent;
 pub use pathing::{add_pos_to_selected_mobs, new_path_for_selected_mobs};
+
+pub type MobChunks = ChunkManager<Mob>;
 
 pub struct MobPlugin;
 impl Plugin for MobPlugin {
@@ -32,7 +32,7 @@ impl Plugin for MobPlugin {
             .add_system(pathing::path_consumer.before(MobMoveEvent::handle))
             //.add_system(movement::test.before(movement::MobMoveEvent::handle))
             .add_startup_system(debug::test_mob_2d)
-            .add_system(chunk::debug::dysplay_boxes.after(MobChunks::update))
+            //           .add_system(chunk::debug::dysplay_boxes.after(MobChunks::update))
             .add_system(digestion)
             .add_system(debug::mod_dir_line)
             .add_plugin(CognitionPlugin);
@@ -42,6 +42,7 @@ impl Plugin for MobPlugin {
 #[derive(Component, Default)]
 pub struct Mob;
 
+impl Chunkable for Mob {}
 #[derive(Bundle, Default)]
 pub struct MobBundle {
     pub mob: Mob,
