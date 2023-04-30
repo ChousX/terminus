@@ -6,7 +6,6 @@ use crate::prelude::*;
 //TODO: This hole thing needs to be built
 
 //Marker for a Map Entity
-<<<<<<< HEAD
 #[derive(Component, Default)]
 pub struct Map;
 
@@ -28,16 +27,3 @@ impl Plugin for MapPlugin {
             .add_system(MapChunks::update);
     }
 }
-=======
-pub struct Map{}
-
-impl Chunkable for Map {}
-
-pub trait MapBuilder {}
-
-pub struct MapBundle{
-    map: Map
-}
-
-pub struct MapPlugin{}
->>>>>>> 7e102f444d4f8147441efebb6cbcd9eaef70e819
