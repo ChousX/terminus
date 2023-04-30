@@ -1,3 +1,5 @@
+pub mod actions;
+mod bindings;
 use crate::prelude::*;
 
 pub struct CameraPlugin;
@@ -7,8 +9,17 @@ impl Plugin for CameraPlugin {
         app.add_event::<CameraMoveEvent>()
             .init_resource::<CameraMoveSettings>()
             .add_startup_system(spawn_camera)
-            //            .add_startup_system(test_icon)
-            .add_system(camera_zoom)
+            .add_startup_system(bindings::CameraBindings::init)
+            .add_systems(
+                (
+                    actions::move_down.run_if(bindings::camera_move_down),
+                    actions::move_up.run_if(bindings::camera_move_up),
+                    actions::move_right.run_if(bindings::camera_move_right),
+                    actions::move_left.run_if(bindings::camera_move_left),
+                    actions::camera_move_mouce.run_if(bindings::move_by_mouce_motion),
+                )
+                    .after(bird_binding::UserInput::update),
+            )
             .add_system(
                 CameraMoveEvent::handle
                     .before(crate::selection::movement::SelectorMovementEvent::handle)
@@ -71,21 +82,4 @@ pub fn test_icon(mut commands: Commands, asset_server: Res<AssetServer>) {
         texture: asset_server.load("icon.png"),
         ..default()
     });
-}
-
-pub fn camera_zoom(
-    mut camera: Query<&mut OrthographicProjection>,
-    mut scroll_evr: EventReader<bevy::input::mouse::MouseWheel>,
-) {
-    let mut projection = camera.single_mut();
-    // example: zoom in
-    let mut total = 0.0;
-    for scroll in scroll_evr.iter() {
-        total += scroll.y;
-    }
-    projection.scale += total; //* time.delta_seconds();
-
-    const MIN: f32 = 1.0;
-    const MAX: f32 = 10.0;
-    projection.scale = projection.scale.clamp(MIN, MAX);
 }

@@ -1,7 +1,5 @@
-use crate::prelude::*;
-
 use super::Selector;
-
+use crate::prelude::*;
 pub enum SelectorMovementEvent {
     MoveTowrds(Vec2),
     MoveTo(Vec2),
@@ -15,7 +13,7 @@ impl SelectorMovementEvent {
     //Asumming:
     // Camera Transform is uptodate
     pub fn handle(
-        mut events: EventReader<Self>,
+        mut events: EventReader<SelectorMovementEvent>,
         mut selector: ResMut<Selector>,
         camera: Query<&Transform, With<Camera2d>>,
     ) {
@@ -24,7 +22,7 @@ impl SelectorMovementEvent {
         for event in events.iter() {
             use SelectorMovementEvent::*;
             match *event {
-                MoveTowrds(spot) => amount += spot,
+                MoveTowrds(_spot) => {} //amount += spot,
                 MoveTo(spot) => last = Some(spot),
                 Up => {}
                 Down => {}
