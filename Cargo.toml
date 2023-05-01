@@ -3,9 +3,11 @@ name = "terminus"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [workspace]
 resolver = "2"
+
+[target.wasm32-unknown-unknown]
+runner = "wasm-server-runner"
 
 [toolchain]
 channel = "nightly"
@@ -19,3 +21,7 @@ bevy_prototype_debug_lines = "0.10.1"
 derive_more = "0.99.17"
 enum-iterator = "1.4.0"
 bevy-inspector-egui = "0.18.1"
+rand = "0.8.5"
+bird_binding_derive = { git = "https://github.com/ChousX/bird_binding_derive.git", version = "0.1.1" }
+bird_binding = { git = "https://github.com/ChousX/bird_binding.git", version = "0.2.0" }
+
