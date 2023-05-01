@@ -12,6 +12,7 @@ impl Plugin for CameraPlugin {
             .add_startup_system(bindings::CameraBindings::init)
             .add_systems(
                 (
+                    actions::camera_zoom,
                     actions::move_down.run_if(bindings::camera_move_down),
                     actions::move_up.run_if(bindings::camera_move_up),
                     actions::move_right.run_if(bindings::camera_move_right),
@@ -20,11 +21,7 @@ impl Plugin for CameraPlugin {
                 )
                     .after(bird_binding::UserInput::update),
             )
-            .add_system(
-                CameraMoveEvent::handle
-                    .before(crate::selection::movement::SelectorMovementEvent::handle)
-                    .run_if(on_event::<CameraMoveEvent>()),
-            );
+            .add_system(CameraMoveEvent::handle.run_if(on_event::<CameraMoveEvent>()));
         info!("PluginLoaded");
     }
 }

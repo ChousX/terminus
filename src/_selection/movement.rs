@@ -5,6 +5,7 @@ pub enum SelectorMovementEvent {
     MoveTo(Vec2),
     Up,
     Down,
+    Amount(Vec2),
     Left,
     Right,
 }
@@ -24,10 +25,13 @@ impl SelectorMovementEvent {
             match *event {
                 MoveTowrds(_spot) => {} //amount += spot,
                 MoveTo(spot) => last = Some(spot),
-                Up => {}
-                Down => {}
-                Left => {}
-                Right => {}
+                Up => amount = Vec2::new(0.0, 1.0),
+                Down => amount = Vec2::new(0.0, -1.0),
+                Left => amount = Vec2::new(-1.0, 0.0),
+                Right => amount = Vec2::new(1.0, 0.0),
+                Amount(new_amount) => {
+                    amount = new_amount;
+                }
             }
         }
         // if there is nothing to do end erly
